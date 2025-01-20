@@ -1,55 +1,48 @@
 using UnityEngine;
 
-public class EggDeform : MonoBehaviour
+[RequireComponent(typeof(MeshFilter), typeof(MeshCollider))]
+public class SoftBodyPhysics : MonoBehaviour
 {
-    public float deformSpeed = 2.0f;    // 変形速度
-    public float deformIntensity = 0.1f; // 変形の強さ
+    public float stiffness = 10f;  // 弾性係数
+    public float damping = 0.1f;  // 減衰係数
+    public float mass = 1f;       // 頂点の質量
 
-    private Mesh originalMesh;         // 元のメッシュ
-    private Vector3[] originalVertices; // 元の頂点
-    private Vector3[] deformedVertices; // 変形後の頂点
+    private Mesh mesh;
+    private Vector3[] originalVertices;
+    private Vector3[] displacedVertices;
+    private Vector3[] velocities;
 
     void Start()
     {
-        // メッシュの取得
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
-        if (meshFilter == null)
-        {
-            Debug.LogError("MeshFilterが見つかりません: " + gameObject.name);
-            return;
-        }
+        mesh = GetComponent<MeshFilter>().mesh;
 
-        originalMesh = meshFilter.mesh;
-        originalVertices = originalMesh.vertices;
-        deformedVertices = new Vector3[originalVertices.Length];
-        System.Array.Copy(originalVertices, deformedVertices, originalVertices.Length);
+        // メッシュの頂点情報を取得
+        originalVertices = mesh.vertices;
+        displacedVertices = new Vector3[originalVertices.Length];
+        velocities = new Vector3[originalVertices.Length];
+
+        originalVertices.CopyTo(displacedVertices, 0);
     }
 
     void Update()
     {
-        if (originalMesh == null) return;
-
-        // 頂点をぷるぷる動かす
-        for (int i = 0; i < originalVertices.Length; i++)
+        for (int i = 0; i < displacedVertices.Length; i++)
         {
-            float offset = Mathf.Sin(Time.time * deformSpeed + originalVertices[i].x * 10f) * deformIntensity;
-            deformedVertices[i] = originalVertices[i] + Vector3.up * offset;
+            Vector3 displacement = displacedVertices[i] - originalVertices[i];
+            Vector3 restoringForce = -displacement * stiffness; // バネの力
+            Vector3 dampingForce = -velocities[i] * damping;   // 減衰の力
+            Vector3 acceleration = (restoringForce + dampingForce) / mass;
+
+            velocities[i] += acceleration * Time.deltaTime; // 速度の更新
+            displacedVertices[i] += velocities[i] * Time.deltaTime; // 位置の更新
         }
 
-        // メッシュの更新
-        originalMesh.vertices = deformedVertices;
-        originalMesh.RecalculateNormals();
-    }
+        // メッシュを更新
+        mesh.vertices = displacedVertices;
+        mesh.RecalculateNormals();
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        // 衝突時に変形強度を一時的に増加
-        deformIntensity = 0.3f;
-        Invoke(nameof(ResetDeformIntensity), 0.5f); // 0.5秒後に元に戻す
-    }
-
-    private void ResetDeformIntensity()
-    {
-        deformIntensity = 0.1f;
+        // MeshColliderを更新
+        GetComponent<MeshCollider>().sharedMesh = null;
+        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 }

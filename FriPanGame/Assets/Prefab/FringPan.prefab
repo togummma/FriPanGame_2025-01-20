@@ -64,7 +64,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fryingPanBase: {fileID: 6861333520859343253}
-  eggPrefab: {fileID: 0}
+  eggPrefab: {fileID: 5976049221298224815, guid: ddc16b30a9007df4a87a8cd0c4d67199, type: 3}
   eggSpawnHeight: 0.5
   eggDespawnHeight: -1
   respawnDelay: 2
