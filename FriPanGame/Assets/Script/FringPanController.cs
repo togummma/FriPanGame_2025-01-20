@@ -14,15 +14,19 @@ public class PanController : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X"); // 左右の動き
         float mouseY = Input.GetAxis("Mouse Y"); // 前後の動き
 
-        // X軸回転 (マウスの前後)
+        // X軸回転 (マウスの前後) - ワールド基準
         float xRotation = mouseY * rotationSpeed * Time.deltaTime;
 
-        // Z軸回転 (マウスの左右)
+        // Z軸回転 (マウスの左右) - オブジェクト基準
         float zRotation = -mouseX * rotationSpeed * Time.deltaTime;
 
-        // ワールド空間のX軸とZ軸で回転を適用
-        Vector3 rotationPoint = rotationCenter.position; // 中心の座標のみ使用
-        transform.RotateAround(rotationPoint, Vector3.right, xRotation); // X軸回転
-        transform.RotateAround(rotationPoint, Vector3.forward, zRotation); // Z軸回転
+        // 回転の中心位置
+        Vector3 rotationPoint = rotationCenter.position;
+
+        // X軸回転 (ワールド空間)
+        transform.RotateAround(rotationPoint, Vector3.right, xRotation);
+
+        // Z軸回転 (オブジェクト空間)
+        transform.RotateAround(rotationPoint, transform.forward, zRotation);
     }
 }
