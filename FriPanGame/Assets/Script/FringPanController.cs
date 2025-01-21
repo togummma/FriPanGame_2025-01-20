@@ -4,7 +4,8 @@ using UnityEngine;
 public class PanController : MonoBehaviour
 {
     // 回転速度を調整するためのパラメータ
-    public float rotationSpeed = 100f;
+    public float rotationSpeed = 200f;
+    public float maxRotationSpeed = 200f; // 回転速度の上限
 
     // フライパンの回転の中心となるオブジェクト
     public Transform rotationCenter;
@@ -27,9 +28,11 @@ public class PanController : MonoBehaviour
 
         // X軸回転 (ワールド空間基準)
         float xRotation = mouseY * rotationSpeed * Time.fixedDeltaTime;
-
-        // Z軸回転 (オブジェクト空間基準)
         float zRotation = -mouseX * rotationSpeed * Time.fixedDeltaTime;
+
+        // 回転速度の上限を適用
+        xRotation = Mathf.Clamp(xRotation, -maxRotationSpeed * Time.fixedDeltaTime, maxRotationSpeed * Time.fixedDeltaTime);
+        zRotation = Mathf.Clamp(zRotation, -maxRotationSpeed * Time.fixedDeltaTime, maxRotationSpeed * Time.fixedDeltaTime);
 
         // 回転の中心を基準に計算
         Vector3 direction = transform.position - rotationCenter.position; // 中心からオブジェクトへのベクトル

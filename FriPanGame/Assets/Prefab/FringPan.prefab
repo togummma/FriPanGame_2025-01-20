@@ -50,6 +50,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 100
+  maxRotationSpeed: 150
   rotationCenter: {fileID: 3829808986104503745}
 --- !u!114 &1806192888339586382
 MonoBehaviour:
@@ -92,9 +93,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 2
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!82 &5927280414980514772
 AudioSource:
   m_ObjectHideFlags: 0
