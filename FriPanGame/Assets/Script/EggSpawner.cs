@@ -51,9 +51,9 @@ public class EggSpawner : MonoBehaviour
             return;
         }
 
-        // フライパン本体の位置と回転を基準に目玉焼きを生成
+        // フライパン本体の位置を基準に目玉焼きを生成 (ワールド基準)
         Vector3 spawnPosition = fryingPanBase.position + Vector3.up * eggSpawnHeight; // 指定の高さに生成
-        Quaternion spawnRotation = fryingPanBase.rotation;
+        Quaternion spawnRotation = Quaternion.identity; // ワールド基準の回転
 
         // 目玉焼きを生成し、参照を保持
         currentEgg = Instantiate(eggPrefab, spawnPosition, spawnRotation);

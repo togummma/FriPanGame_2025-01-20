@@ -1,55 +1,28 @@
 using UnityEngine;
 
-public class FryingPanTiltController : MonoBehaviour
+public class PanController : MonoBehaviour
 {
-    // 傾ける速度
-    public float tiltSpeed = 50f;
+    // 回転速度を調整するためのパラメータ
+    public float rotationSpeed = 100f;
 
-    // 傾ける角度の制限（最大角度）
-    public float maxTiltAngle = 45f;
-
-    // マウス感度
-    public float mouseSensitivity = 5.0f;
-
-    // 回転の中心（フライパン本体オブジェクト）
+    // フライパンの回転の中心となるオブジェクト
     public Transform rotationCenter;
 
     void Update()
     {
-        // 回転中心が設定されていない場合はスクリプトを停止
-        if (rotationCenter == null)
-        {
-            Debug.LogWarning("回転中心（rotationCenter）が設定されていません");
-            return;
-        }
+        // マウス入力を取得
+        float mouseX = Input.GetAxis("Mouse X"); // 左右の動き
+        float mouseY = Input.GetAxis("Mouse Y"); // 前後の動き
 
-        // 入力取得
-        float tiltX = Input.GetAxis("Vertical") + Input.GetAxis("Mouse Y") * mouseSensitivity;   // 前後方向の傾き
-        float tiltZ = -Input.GetAxis("Horizontal") - Input.GetAxis("Mouse X") * mouseSensitivity; // 左右方向の傾き
+        // X軸回転 (マウスの前後)
+        float xRotation = mouseY * rotationSpeed * Time.deltaTime;
 
-        // 現在の回転角度を取得
-        Vector3 currentRotation = transform.eulerAngles;
+        // Z軸回転 (マウスの左右)
+        float zRotation = -mouseX * rotationSpeed * Time.deltaTime;
 
-        // 回転角度を計算（ローカル回転で制限をかける）
-        float newTiltX = Mathf.Clamp(
-            NormalizeAngle(currentRotation.x + tiltX * tiltSpeed * Time.deltaTime), 
-            -maxTiltAngle, maxTiltAngle
-        );
-        float newTiltZ = Mathf.Clamp(
-            NormalizeAngle(currentRotation.z + tiltZ * tiltSpeed * Time.deltaTime), 
-            -maxTiltAngle, maxTiltAngle
-        );
-
-        // YZ平面に制限（ローカル回転をリセット）
-        float clampedTiltY = NormalizeAngle(currentRotation.y); // Z軸がYZ平面から外れないようにする
-
-        // 回転の中心を基準に回転を適用
-        transform.localEulerAngles = new Vector3(newTiltX, clampedTiltY, newTiltZ);
-    }
-
-    // 角度を -180 ～ 180 に正規化する
-    private float NormalizeAngle(float angle)
-    {
-        return angle > 180 ? angle - 360 : angle;
+        // ワールド空間のX軸とZ軸で回転を適用
+        Vector3 rotationPoint = rotationCenter.position; // 中心の座標のみ使用
+        transform.RotateAround(rotationPoint, Vector3.right, xRotation); // X軸回転
+        transform.RotateAround(rotationPoint, Vector3.forward, zRotation); // Z軸回転
     }
 }
